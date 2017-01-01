@@ -28,9 +28,9 @@ class ReportTest(TestCase):
     @with_httmock(ga_mock)
     def test_report(self):
         mr = MockRequestable()
-        (response,) = report('UA-123456-78', 'CID', mr)
+        (response,) = report('UA-123456-78', 'UID', mr)
         data = response.json()
-        self.assertEqual(data['cid'], ['CID'])
+        self.assertEqual(data['uid'], ['UID'])
         self.assertEqual(data['tid'], ['UA-123456-78'])
         self.assertEqual(data['t'], ['mock'])
 
@@ -214,7 +214,7 @@ class PayloadsTest(TestCase):
         trans = Transaction('trans-01', items)
         trans_payloads = list(payloads(
             'tracking-id',
-            'client-id',
+            'user-id',
             trans,
             SystemInfo(language='en-gb'),
             {'extra-header-key': 'extra-head-value'}))
@@ -222,7 +222,7 @@ class PayloadsTest(TestCase):
         self.assertEqual(len(trans_payloads), 3)
         for data, headers in trans_payloads:
             self.assertEqual(data['tid'], 'tracking-id')
-            self.assertEqual(data['cid'], 'client-id')
+            self.assertEqual(data['uid'], 'user-id')
             self.assertEqual(data['ul'], 'en-gb')
             self.assertTrue(headers['extra-header-key'], 'extra-header-value')
 

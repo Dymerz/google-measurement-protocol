@@ -1,24 +1,9 @@
 google-measurement-protocol
 ===========================
 
-A Python implementation of Google Analytics Measurement Protocol
+A Python implementation of Google Analytics Measurement Protocol. Forked from https://github.com/mirumee/google-measurement-protocol and modified to only support user IDs, not client IDs.
 
 Transaction handling depends on the `prices` library.
-
-
-Generating a client ID
-----------------------
-
-Google strongly encourages using UUID version 4 as unique user handles.
-It's up to you to generate and persist the ID between actions, just make
-sure that all actions performed by the same user are reported using the
-same client ID.
-
-```python
-import uuid
-
-client_id = uuid.uuid4()
-```
 
 
 Reporting a page view
@@ -37,7 +22,7 @@ Example:
 from google_measurement_protocol import PageView, report
 
 view = PageView(path='/my-page/', title='My Page', referrer='http://example.com/')
-report('UA-123456-1', client_id, view)
+report('UA-123456-1', user_id, view)
 ```
 
 
@@ -54,7 +39,7 @@ Example:
 from google_measurement_protocol import Event, report
 
 event = Event('profile', 'user_registered')
-report('UA-123456-1', client_id, event)
+report('UA-123456-1', user_id, event)
 ```
 
 
@@ -82,7 +67,7 @@ transaction_id = '0001'  # any string should do
 items = [Item('My awesome product', Price(90, currency='EUR'), quantity=2),
          Item('Another product', Price(30, currency='EUR'))]
 transaction = Transaction(transaction_id, items)
-report('UA-123456-1', client_id, transaction)
+report('UA-123456-1', user_id, transaction)
 ```
 
 
@@ -115,7 +100,7 @@ transaction_id = '0001'  # any string should do
 items = [Item('My awesome product', 90, quantity=2),
          Item('Another product', 30))]
 transaction = EnhancedPurchase(transaction_id, items, '/cart/')
-report('UA-123456-1', client_id, transaction)
+report('UA-123456-1', user_id, transaction)
 ```
 
 
@@ -142,5 +127,5 @@ from google_measurement_protocol import PageView, report, SystemInfo
 view = PageView(path='/my-page/', title='My Page', referrer='http://example.com/')
 headers = {'user-agent': 'my-user-agent 1.0'}
 info = SystemInfo(language='en-us')
-report('UA-123456-1', client_id, view, extra_info=info, extra_header=headers)
+report('UA-123456-1', user_id, view, extra_info=info, extra_header=headers)
 ```

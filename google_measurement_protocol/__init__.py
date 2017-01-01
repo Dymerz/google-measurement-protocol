@@ -10,15 +10,15 @@ def _request(data, extra_headers):
                          timeout=5.0)
 
 
-def report(tracking_id, client_id, requestable, extra_info=None,
+def report(tracking_id, user_id, requestable, extra_info=None,
            extra_headers=None):
     """Actually report measurements to Google Analytics."""
     return [_request(data, extra_headers)
             for data, extra_headers in payloads(
-            tracking_id, client_id, requestable, extra_info, extra_headers)]
+            tracking_id, user_id, requestable, extra_info, extra_headers)]
 
 
-def payloads(tracking_id, client_id, requestable, extra_info=None,
+def payloads(tracking_id, user_id, requestable, extra_info=None,
              extra_headers=None):
     """Get data and headers of API requests for Google Analytics.
 
@@ -28,7 +28,7 @@ def payloads(tracking_id, client_id, requestable, extra_info=None,
     extra_payload = {
         'v': '1',
         'tid': tracking_id,
-        'cid': client_id,
+        'uid': user_id,
         'aip': '1'}
     if extra_info:
         for payload in extra_info:
