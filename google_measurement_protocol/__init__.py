@@ -1,19 +1,20 @@
 from collections import namedtuple
 
+import os
 import requests
 
-TRACKING_URI = 'https://ssl.google-analytics.com/collect'
+DEFAULT_TRACKING_URI = 'https://www.google-analytics.com/collect'
 
 
-def _request(data, extra_headers):
-    return requests.post(TRACKING_URI, data=data, headers=extra_headers,
+def _request(data, extra_headers, tracking_uri):
+    return requests.post(tracking_uri, data=data, headers=extra_headers,
                          timeout=5.0)
 
 
 def report(tracking_id, user_id, requestable, extra_info=None,
-           extra_headers=None):
+           extra_headers=None, tracking_uri=DEFAULT_TRACKING_URI):
     """Actually report measurements to Google Analytics."""
-    return [_request(data, extra_headers)
+    return [_request(data, extra_headers, tracking_uri)
             for data, extra_headers in payloads(
             tracking_id, user_id, requestable, extra_info, extra_headers)]
 
