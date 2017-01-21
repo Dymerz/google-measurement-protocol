@@ -50,15 +50,18 @@ class Requestable(object):
         yield self.get_payload()
 
 
-class SystemInfo(Requestable, namedtuple('SystemInfo', 'language')):
+class SystemInfo(Requestable, namedtuple('SystemInfo', 'language, user_agent')):
 
-    def __new__(cls, language=None):
-        return super(SystemInfo, cls).__new__(cls, language)
+    def __new__(cls, language=None, user_agent=None):
+        return super(SystemInfo, cls).__new__(cls, language, user_agent)
 
     def get_payload(self):
         payload = {}
         if self.language:
             payload['ul'] = self.language
+        if self.user_agent:
+            payload['ua'] = self.user_agent
+
         return payload
 
 

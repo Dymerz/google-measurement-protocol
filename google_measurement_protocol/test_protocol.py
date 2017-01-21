@@ -17,7 +17,7 @@ class MockRequestable(Requestable):
         return {'t': 'mock'}
 
 
-@urlmatch(netloc=r'ssl\.google-analytics\.com', path='/collect')
+@urlmatch(netloc=r'www\.google-analytics\.com', path='/collect')
 def ga_mock(url, request):
     qs = parse_qs(request.body)
     return response(200, qs)
@@ -35,7 +35,7 @@ class ReportTest(TestCase):
         self.assertEqual(data['t'], ['mock'])
 
     @with_httmock(ga_mock)
-    def test_extra_info(self):
+    def test_extra_info_language(self):
         empty_info = SystemInfo()
         self.assertEqual(empty_info.get_payload(), {})
         mr = MockRequestable()
@@ -43,6 +43,14 @@ class ReportTest(TestCase):
         (response,) = report('UA-123456-78', 'CID', mr, extra_info=info)
         data = response.json()
         self.assertEqual(data['ul'], ['en-gb'])
+
+    @with_httmock(ga_mock)
+    def test_extra_info_user_agent(self):
+        mr = MockRequestable()
+        info = SystemInfo(user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36')
+        (response,) = report('UA-123456-78', 'CID', mr, extra_info=info)
+        data = response.json()
+        self.assertEqual(data['ua'], ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'])
 
 
 class PageViewTest(TestCase):
