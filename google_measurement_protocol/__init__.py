@@ -23,7 +23,7 @@ def report(tracking_id, user_id, requestable, extra_info=None, extra_headers=Non
             new_data.append(requests.models.RequestEncodingMixin._encode_params(data))
         return [_request(new_data, new_extra_headers, BATCH_TRACKING_URI)]
 
-    if isinstance(tracking_id, list) and len(tracking_id) > 1:
+    if isinstance(tracking_id, list) and len(tracking_id) == 1:
         tracking_id = tracking_id[0]
 
     return [_request(data, extra_headers, tracking_uri)
