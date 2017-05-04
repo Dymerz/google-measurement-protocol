@@ -1,3 +1,5 @@
+import unittest
+
 from unittest import TestCase
 try:
     from urllib.parse import parse_qs
@@ -33,6 +35,16 @@ class ReportTest(TestCase):
         self.assertEqual(data['uid'], ['UID'])
         self.assertEqual(data['tid'], ['UA-123456-78'])
         self.assertEqual(data['t'], ['mock'])
+
+    @with_httmock(ga_mock)
+    def test_report_multiple(self):
+        mr = MockRequestable()
+        (response,) = report(['UA-123456-78', 'UA-123456-90'], 'UID', mr)
+        if 'Content-Type' in response.headers and response.headers['Content-Type'] == 'application/json':
+            data = response.json()
+            self.assertEqual(data['uid'], ['UID'])
+            self.assertEqual(data['tid'], ['UA-123456-78'])
+            self.assertEqual(data['t'], ['mock'])
 
     @with_httmock(ga_mock)
     def test_extra_info_language(self):
