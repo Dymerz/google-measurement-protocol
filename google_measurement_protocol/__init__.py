@@ -42,10 +42,14 @@ def payloads(tracking_id, user_id, requestable, extra_info=None,
         'v': '1',
         'tid': tracking_id,
         'uid': user_id,
-        'aip': '1'}
+        'aip': '1'
+    }
     if extra_info:
         for payload in extra_info:
             extra_payload.update(payload)
+
+    if isinstance(requestable, dict):
+        requestable = [requestable]
 
     for request_payload in requestable:
         final_payload = dict(request_payload)
