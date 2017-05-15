@@ -264,9 +264,31 @@ class EnhancedPurchase(Requestable,
         return payload
 
     def __iter__(self):
-        event = Event('ecommerce', 'purchase')
+        event = Event('Ecommerce', 'Purchase')
         yield event.get_payload()
         to_return = self.get_payload()
         for i in range(len(self.items)):
             to_return.update(self.items[i].get_payload_for_transaction(i + 1))
+        yield to_return
+
+
+class EnhancedPurchaseRefund(Requestable,
+                             namedtuple('EnhancedPurchaseRefund', 'transaction_id')):
+
+    def __new__(cls, transaction_id):
+        return super(EnhancedPurchaseRefund, cls).__new__(cls, transaction_id)
+
+    def get_payload(self):
+        payload = {
+            'pa': 'refund',
+            'ti': self.transaction_id,
+            'ni': '1'
+        }
+
+        return payload
+
+    def __iter__(self):
+        event = Event('Ecommerce', 'Refund')
+        yield event.get_payload()
+        to_return = self.get_payload()
         yield to_return
