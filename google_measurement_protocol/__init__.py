@@ -320,3 +320,24 @@ class EnhancedPurchaseRefund(Requestable,
         to_return = event.get_payload()
         to_return.update(self.get_payload())
         yield to_return
+
+
+class UserInfo(Requestable, namedtuple('UserInfo', 'language, user_agent app_name app_version app_id')):
+
+    def __new__(cls, language=None, user_agent=None, app_name=None, app_version=None, app_id=None):
+        return super(UserInfo, cls).__new__(cls, language, user_agent, app_name, app_version, app_id)
+
+    def get_payload(self):
+        payload = {}
+        if self.language:
+            payload['ul'] = self.language
+        if self.user_agent:
+            payload['ua'] = self.user_agent
+        if self.app_name:
+            payload['an'] = self.app_name
+        if self.app_version:
+            payload['av'] = self.app_version
+        if self.app_id:
+            payload['aid'] = self.app_id
+
+        return payload
