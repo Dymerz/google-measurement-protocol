@@ -12,6 +12,12 @@ def _request(data, extra_headers, tracking_uri):
     return requests.post(tracking_uri, data=data, headers=extra_headers, timeout=5.0)
 
 
+def request_ga(data, extra_headers, tracking_uri):
+    if tracking_uri == BATCH_TRACKING_URI and isinstance(data, list):
+        return requests.post(tracking_uri, data="\n".join([dp for dp in data]), headers=extra_headers, timeout=5.0)
+    return requests.post(tracking_uri, data=data, headers=extra_headers, timeout=5.0)
+
+
 def report(tracking_id, user_id, requestable, extra_info=None, extra_headers=None, tracking_uri=DEFAULT_TRACKING_URI):
     """Actually report measurements to Google Analytics."""
     if isinstance(tracking_id, list) and len(tracking_id) > 1:
@@ -27,6 +33,25 @@ def report(tracking_id, user_id, requestable, extra_info=None, extra_headers=Non
         tracking_id = tracking_id[0]
 
     return [_request(data, extra_headers, tracking_uri)
+            for data, extra_headers in payloads(
+            tracking_id, user_id, requestable, extra_info, extra_headers)]
+
+
+def report_prepare(tracking_id, user_id, requestable, extra_info=None, extra_headers=None, tracking_uri=DEFAULT_TRACKING_URI):
+    """Actually report measurements to Google Analytics."""
+    if isinstance(tracking_id, list) and len(tracking_id) > 1:
+        new_data = []
+        new_extra_headers = None
+        for track_id in tracking_id:
+            data, extra_headers = list(payloads(track_id, user_id, requestable, extra_info, extra_headers))[0]
+            new_extra_headers = extra_headers
+            new_data.append(requests.models.RequestEncodingMixin._encode_params(data))
+        return [{'data': new_data, 'extra_headers': new_extra_headers, 'tracking_uri': BATCH_TRACKING_URI}]
+
+    if isinstance(tracking_id, list) and len(tracking_id) == 1:
+        tracking_id = tracking_id[0]
+
+    return [{'data': data, 'extra_headers': extra_headers, 'tracking_uri': tracking_uri}
             for data, extra_headers in payloads(
             tracking_id, user_id, requestable, extra_info, extra_headers)]
 
