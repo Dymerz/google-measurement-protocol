@@ -48,9 +48,6 @@ def payloads(tracking_id, user_id, requestable, extra_info=None,
         for payload in extra_info:
             extra_payload.update(payload)
 
-    if isinstance(requestable, dict):
-        requestable = [requestable]
-
     for request_payload in requestable:
         final_payload = dict(request_payload)
         final_payload.update(extra_payload)
@@ -180,9 +177,10 @@ class Item(namedtuple('Item', 'name unit_price quantity item_id category')):
         payload = {
             't': 'item',
             'ti': transaction_id,
-            'in': self.name}
-        payload['ip'] = str(self.unit_price.gross)
-        payload['cu'] = self.unit_price.currency
+            'in': self.name,
+            'ip': str(self.unit_price.gross),
+            'cu': self.unit_price.currency
+        }
         if self.quantity:
             payload['iq'] = str(int(self.quantity))
         if self.item_id:
@@ -252,7 +250,8 @@ class EnhancedPurchase(Requestable,
         payload = {
             'pa': 'purchase',
             'ti': self.transaction_id,
-            'dp': self.url_page}
+            'dp': self.url_page
+        }
         tax = self.tax or 0
         payload['tt'] = str(tax)
         total = self.get_total()
@@ -269,8 +268,8 @@ class EnhancedPurchase(Requestable,
 
     def __iter__(self):
         event = Event('Ecommerce', 'Purchase')
-        yield event.get_payload()
-        to_return = self.get_payload()
+        to_return = event.get_payload()
+        to_return.update(self.get_payload())
         for i in range(len(self.items)):
             to_return.update(self.items[i].get_payload_for_transaction(i + 1))
         yield to_return
@@ -293,6 +292,6 @@ class EnhancedPurchaseRefund(Requestable,
 
     def __iter__(self):
         event = Event('Ecommerce', 'Refund')
-        yield event.get_payload()
-        to_return = self.get_payload()
+        to_return = event.get_payload()
+        to_return.update(self.get_payload())
         yield to_return
