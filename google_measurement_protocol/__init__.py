@@ -72,6 +72,10 @@ def payloads(tracking_id, user_id, requestable, extra_info=None,
     if extra_info:
         for payload in extra_info:
             extra_payload.update(payload)
+        if 'uip' in extra_payload.keys() and extra_payload['uip']:
+            extra_payload.pop('aip', None)
+        else:
+            extra_payload.pop('uip', None)
 
     for request_payload in requestable:
         final_payload = dict(request_payload)
@@ -322,10 +326,10 @@ class EnhancedPurchaseRefund(Requestable,
         yield to_return
 
 
-class UserInfo(Requestable, namedtuple('UserInfo', 'language, user_agent app_name app_version app_id')):
+class UserInfo(Requestable, namedtuple('UserInfo', 'language, user_agent app_name app_version app_id remote_ip')):
 
-    def __new__(cls, language=None, user_agent=None, app_name=None, app_version=None, app_id=None):
-        return super(UserInfo, cls).__new__(cls, language, user_agent, app_name, app_version, app_id)
+    def __new__(cls, language=None, user_agent=None, app_name=None, app_version=None, app_id=None, remote_ip=None):
+        return super(UserInfo, cls).__new__(cls, language, user_agent, app_name, app_version, app_id, remote_ip)
 
     def get_payload(self):
         payload = {}
@@ -333,6 +337,8 @@ class UserInfo(Requestable, namedtuple('UserInfo', 'language, user_agent app_nam
             payload['ul'] = self.language
         if self.user_agent:
             payload['ua'] = self.user_agent
+        if self.remote_ip:
+            payload['uip'] = self.remote_ip
         if self.app_name:
             payload['an'] = self.app_name
         if self.app_version:
